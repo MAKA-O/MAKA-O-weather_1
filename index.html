@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><span class="material-icons">wb_sunny</span> Weather App</h1>
+    </header>
+
+    <div class="search-box">
+        <form id="weather-form">
+            <div class="input-group">
+                <span class="material-icons">search</span>
+                <input
+                        type="text"
+                        id="city-input"
+                        placeholder="Введите название города..."
+                        required
+                >
+                <button type="submit" id="search-btn">
+                    <span class="material-icons" id="search-icon">search</span>
+                    <span class="material-icons loader" id="loader">refresh</span>
+                </button>
+            </div>
+            <div class="error" id="error-message"></div>
+        </form>
+    </div>
+
+    <div class="weather-card" id="weather-result">
+        <div class="location">
+            <span class="material-icons">location_on</span>
+            <h2 id="city-name"></h2>
+        </div>
+
+        <div class="weather-main">
+            <div class="temp">
+                <span id="temperature"></span>°C
+            </div>
+            <div class="weather-icon">
+                <img id="weather-icon" src="" alt="">
+            </div>
+        </div>
+
+        <div class="weather-info">
+            <div class="info-item">
+                <span class="material-icons">visibility</span>
+                <div>
+                    <span>Описание</span>
+                    <span id="description"></span>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="material-icons">water_drop</span>
+                <div>
+                    <span>Влажность</span>
+                    <span id="humidity"></span>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="material-icons">thermostat</span>
+                <div>
+                    <span>Ощущается</span>
+                    <span id="feels-like"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
