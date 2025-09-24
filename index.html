@@ -22,12 +22,14 @@
                         type="text"
                         id="city-input"
                         placeholder="Введите название города..."
+                        autocomplete="off"
                         required
                 >
                 <button type="submit" id="search-btn">
                     <span class="material-icons" id="search-icon">search</span>
                     <span class="material-icons loader" id="loader">refresh</span>
                 </button>
+                <div class="autocomplete-container" id="autocomplete-suggestions"></div>
             </div>
             <div class="error" id="error-message"></div>
         </form>

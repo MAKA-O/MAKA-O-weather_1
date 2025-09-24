@@ -10,6 +10,7 @@ const searchIcon = document.getElementById('search-icon');
 const loader = document.getElementById('loader');
 const errorMessage = document.getElementById('error-message');
 const weatherResult = document.getElementById('weather-result');
+const autocompleteContainer = document.getElementById('autocomplete-suggestions');
 
 // Элементы данных
 const cityName = document.getElementById('city-name');
@@ -18,6 +19,38 @@ const description = document.getElementById('description');
 const humidity = document.getElementById('humidity');
 const feelsLike = document.getElementById('feels-like');
 const weatherIcon = document.getElementById('weather-icon');
+
+// Массив городов
+const popularCities = [
+    'Алматы', 'Нур-Султан', 'Шымкент', 'Актобе', 'Тараз', 'Павлодар',
+    'Усть-Каменогорск', 'Семей', 'Атырау', 'Костанай', 'Кызылорда',
+    'Уральск', 'Петропавловск', 'Актау', 'Темиртау', 'Туркестан',
+    'Кокшетау', 'Талдыкорган', 'Экибастуз', 'Рудный', 'Жезказган',
+    'Балхаш', 'Караганда', 'Шахтинск', 'Степногорск', 'Лисаковск',
+    'Жанаозен', 'Риддер', 'Аркалык', 'Капчагай', 'Текели',
+    'Житикара', 'Хромтау', 'Аксу', 'Булаево', 'Макинск',
+    'Есик', 'Жаркент', 'Талгар', 'Каскелен', 'Отеген батыр',
+    'Шу', 'Сарыагаш', 'Арысь', 'Кентау', 'Сатпаев', 'Приозерск',
+    'Аягоз', 'Серебрянск', 'Зыряновск',
+    'Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Казань',
+    'Нижний Новгород', 'Челябинск', 'Самара', 'Омск', 'Ростов-на-Дону',
+    'Уфа', 'Красноярск', 'Воронеж', 'Пермь', 'Волгоград', 'Краснодар',
+    'Саратов', 'Тюмень', 'Тольятти', 'Ижевск', 'Барнаул', 'Ульяновск',
+    'Иркутск', 'Хабаровск', 'Ярославль', 'Владивосток', 'Махачкала',
+    'Томск', 'Оренбург', 'Кемерово', 'Новокузнецк', 'Рязань',
+    'Набережные Челны', 'Астрахань', 'Пенза', 'Липецк', 'Тула',
+    'Киров', 'Чебоксары', 'Калининград', 'Брянск', 'Курск',
+    'Иваново', 'Магнитогорск', 'Тверь', 'Ставрополь', 'Сочи', 'Белгород',
+    'Лондон', 'Париж', 'Берлин', 'Мадрид', 'Рим', 'Амстердам', 'Прага',
+    'Вена', 'Стокгольм', 'Осло', 'Копенгаген', 'Хельсинки', 'Варшава',
+    'Нью-Йорк', 'Лос-Анджелес', 'Чикаго', 'Хьюстон', 'Феникс', 'Филадельфия',
+    'Токио', 'Пекин', 'Сеул', 'Бангкок', 'Сингапур', 'Дубай'
+];
+
+// Переменные для автодополнения
+let autocompleteTimeout;
+let activeIndex = -1;
+let isAutocompleteOpen = false;
 
 // Конвертация температуры
 function kelvinToCelsius(kelvin) {
@@ -31,7 +64,6 @@ function showError(message) {
     weatherResult.classList.remove('show');
 }
 
-// Скрыть ошибки
 function hideError() {
     errorMessage.classList.remove('show');
 }
@@ -43,7 +75,6 @@ function showLoading() {
     searchBtn.disabled = true;
 }
 
-// Скрыть загрузки
 function hideLoading() {
     searchIcon.style.display = 'block';
     loader.style.display = 'none';
@@ -84,12 +115,75 @@ async function getWeather(city) {
     }
 }
 
-// Обработка формы
-async function handleSubmit(e) {
-    e.preventDefault();
+// Поиск совпадений в городах
+function findCityMatches(query) {
+    if (!query || query.length < 2) return [];
 
-    const city = cityInput.value.trim();
-    if (!city) {
+    const lowercaseQuery = query.toLowerCase();
+    return popularCities
+        .filter(city => city.toLowerCase().includes(lowercaseQuery))
+        .slice(0, 6);
+}
+
+// Отображение предложений автодополнения
+function displaySuggestions(cities) {
+    autocompleteContainer.innerHTML = '';
+    activeIndex = -1;
+
+    if (cities.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+
+    cities.forEach((city, index) => {
+        const suggestion = document.createElement('div');
+        suggestion.className = 'suggestion-item';
+        suggestion.innerHTML = `
+            <span class="material-icons">location_on</span>
+            ${city}
+        `;
+
+        suggestion.addEventListener('click', async () => {
+            cityInput.value = city;
+            hideAutocomplete();
+            await performSearch(city);
+        });
+
+        suggestion.addEventListener('mouseenter', () => {
+            setActiveIndex(index);
+        });
+
+        autocompleteContainer.appendChild(suggestion);
+    });
+
+    showAutocomplete();
+}
+
+// Показать автодополнение
+function showAutocomplete() {
+    autocompleteContainer.style.display = 'block';
+    isAutocompleteOpen = true;
+}
+
+// Скрыть автодополнение
+function hideAutocomplete() {
+    autocompleteContainer.style.display = 'none';
+    isAutocompleteOpen = false;
+    activeIndex = -1;
+}
+
+// Установить активный элемент
+function setActiveIndex(index) {
+    const suggestions = autocompleteContainer.querySelectorAll('.suggestion-item');
+    suggestions.forEach((item, idx) => {
+        item.classList.toggle('active', idx === index);
+    });
+    activeIndex = index;
+}
+
+// Выполнить поиск погоды
+async function performSearch(city) {
+    if (!city.trim()) {
         showError('Введите название города');
         return;
     }
@@ -108,14 +202,84 @@ async function handleSubmit(e) {
     }
 }
 
-// Скрыть ошибку при вводе
-function handleInput() {
+// Обработка формы
+async function handleSubmit(e) {
+    e.preventDefault();
+    const city = cityInput.value.trim();
+    hideAutocomplete();
+    await performSearch(city);
+}
+
+function handleInput(e) {
+    const query = e.target.value.trim();
+
+    // Скрыть ошибку при вводе
     if (errorMessage.classList.contains('show')) {
         hideError();
     }
+
+    // Очистить предыдущий таймер
+    if (autocompleteTimeout) {
+        clearTimeout(autocompleteTimeout);
+    }
+
+
+    // Добавить задержку для оптимизации
+    autocompleteTimeout = setTimeout(() => {
+        const matches = findCityMatches(query);
+        displaySuggestions(matches);
+    }, 150);
 }
 
-// Инициализация
-form.addEventListener('submit', handleSubmit);
-cityInput.addEventListener('input', handleInput);
-cityInput.focus();
+// Обработка клавиатурной навигации
+function handleKeyNavigation(e) {
+    if (!isAutocompleteOpen) return;
+
+    const suggestions = autocompleteContainer.querySelectorAll('.suggestion-item');
+    if (suggestions.length === 0) return;
+
+    switch (e.key) {
+        case 'ArrowDown':
+            e.preventDefault();
+            activeIndex = (activeIndex + 1) % suggestions.length;
+            setActiveIndex(activeIndex);
+            break;
+
+        case 'ArrowUp':
+            e.preventDefault();
+            activeIndex = activeIndex <= 0 ? suggestions.length - 1 : activeIndex - 1;
+            setActiveIndex(activeIndex);
+            break;
+
+        case 'Enter':
+            if (activeIndex >= 0) {
+                e.preventDefault();
+                suggestions[activeIndex].click();
+            }
+            break;
+
+        case 'Escape':
+            hideAutocomplete();
+            cityInput.blur();
+            break;
+    }
+}
+
+// Скрытие предложений при клике вне
+function handleDocumentClick(e) {
+    if (!e.target.closest('.input-group')) {
+        hideAutocomplete();
+    }
+}
+
+// Инициализация событий
+function initializeEvents() {
+    form.addEventListener('submit', handleSubmit);
+    cityInput.addEventListener('input', handleInput);
+    cityInput.addEventListener('keydown', handleKeyNavigation);
+    document.addEventListener('click', handleDocumentClick);
+    cityInput.focus();
+}
+
+// Инициализация приложения
+document.addEventListener('DOMContentLoaded', initializeEvents);

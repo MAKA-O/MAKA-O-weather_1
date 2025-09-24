@@ -45,6 +45,7 @@ header h1 {
 }
 
 .input-group {
+    position: relative;
     display: flex;
     align-items: center;
     background: #2a2a2a;
@@ -52,12 +53,18 @@ header h1 {
     border: 1px solid #3a3a3a;
     padding: 0 20px;
     gap: 16px;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
     width: 100%;
 }
 
 .input-group:focus-within {
     border-color: #555;
+}
+
+.input-group:focus-within:has(.autocomplete-container[style*="block"]) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
 }
 
 .input-group .material-icons {
@@ -93,6 +100,11 @@ header h1 {
     color: #e0e0e0;
 }
 
+#search-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .loader {
     display: none;
     animation: spin 1s linear infinite;
@@ -101,6 +113,74 @@ header h1 {
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+/* Автодополнение */
+.autocomplete-container {
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.autocomplete-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.autocomplete-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 0 0 16px 0;
+}
+
+.autocomplete-container::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+
+.autocomplete-container::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.suggestion-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(58, 58, 58, 0.5);
+    transition: all 0.2s ease;
+    color: #e0e0e0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+    background-color: #3a3a3a;
+    color: #ffffff;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 16px 16px;
+}
+
+.suggestion-item .material-icons {
+    font-size: 18px;
+    color: #888;
+}
+
+.suggestion-item:hover .material-icons,
+.suggestion-item.active .material-icons {
+    color: #bbb;
 }
 
 .error {
@@ -144,11 +224,11 @@ header h1 {
 
 .location .material-icons {
     color: #888;
-    font-size: 22px;
+    font-size: 24px;
 }
 
 .location h2 {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
     color: #ffffff;
 }
@@ -156,48 +236,52 @@ header h1 {
 .weather-main {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
     margin-bottom: 32px;
-    text-align: center;
 }
 
 .temp {
-    font-size: 64px;
+    font-size: 72px;
     font-weight: 600;
     color: #ffffff;
+    line-height: 1;
 }
 
 .weather-icon img {
     width: 80px;
     height: 80px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
 .weather-info {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 100%;
+    gap: 16px;
 }
 
 .info-item {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.info-item:last-child {
+    border-bottom: none;
 }
 
 .info-item .material-icons {
     color: #888;
     font-size: 24px;
+    min-width: 24px;
 }
 
 .info-item div {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
-    max-width: 200px;
 }
 
 .info-item div span:first-child {
@@ -207,51 +291,61 @@ header h1 {
 
 .info-item div span:last-child {
     color: #ffffff;
-    font-weight: 500;
     font-size: 16px;
+    font-weight: 500;
 }
 
 /* Адаптивность */
 @media (max-width: 600px) {
     .container {
-        max-width: 400px;
         padding: 20px;
     }
 
     header h1 {
         font-size: 28px;
+        margin-bottom: 32px;
     }
 
     .temp {
-        font-size: 56px;
+        font-size: 64px;
     }
 
     .weather-icon img {
         width: 70px;
         height: 70px;
     }
+
+    .weather-card {
+        padding: 24px;
+    }
 }
 
 @media (max-width: 480px) {
     .container {
-        padding: 15px;
+        padding: 16px;
     }
 
     header h1 {
         font-size: 24px;
+        margin-bottom: 24px;
     }
 
     .temp {
-        font-size: 48px;
+        font-size: 56px;
     }
 
-    .weather-icon img {
-        width: 60px;
-        height: 60px;
+    .weather-main {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
     }
 
-    .info-item div span:first-child,
-    .info-item div span:last-child {
-        font-size: 14px;
+    #city-input {
+        font-size: 16px;
+    }
+
+    .suggestion-item {
+        padding: 10px 16px;
+        font-size: 15px;
     }
 }
