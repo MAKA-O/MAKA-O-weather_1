@@ -231,6 +231,10 @@ header h1 {
     font-size: 24px;
     font-weight: 500;
     color: #ffffff;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    text-align: center;
 }
 
 .weather-main {
@@ -251,6 +255,20 @@ header h1 {
     width: 80px;
     height: 80px;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.weather-description {
+    text-align: center;
+    color: #cccccc;
+    font-size: 18px;
+    margin-bottom: 24px;
+    font-weight: 400;
+    text-transform: capitalize;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
+    max-width: 100%;
 }
 
 .weather-info {
@@ -287,12 +305,17 @@ header h1 {
 .info-item div span:first-child {
     color: #888;
     font-size: 16px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .info-item div span:last-child {
     color: #ffffff;
     font-size: 16px;
     font-weight: 500;
+    text-align: right;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Адаптивность */
@@ -317,6 +340,11 @@ header h1 {
 
     .weather-card {
         padding: 24px;
+    }
+
+    .weather-description {
+        font-size: 16px;
+        margin-bottom: 20px;
     }
 }
 
@@ -347,5 +375,24 @@ header h1 {
     .suggestion-item {
         padding: 10px 16px;
         font-size: 15px;
+    }
+
+    .weather-description {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .location h2 {
+        font-size: 20px;
+    }
+
+    .info-item div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .info-item div span:last-child {
+        text-align: left;
     }
 }
